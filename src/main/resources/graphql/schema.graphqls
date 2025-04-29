@@ -1,7 +1,81 @@
-schema {
-    query: Query
+scalar Date
+scalar Email
+scalar RegistrationNumber
+
+type ResponseType {
+    success: Boolean!
+    message: String
+    code: String
+}
+
+type Car {
+    id: ID!
+    make: String!
+    model: String!
+    year: Int
+    registrationNumber: RegistrationNumber
+    owner: Owner
+}
+
+type Owner {
+    id: ID!
+    name: String!
+    email: Email!
+    phoneNumber: String
+    cars: [Car]
+}
+
+# External REST API data
+type CarSpecification {
+    engineType: String
+    horsepower: Int
+    transmission: String
+    fuelConsumption: Float
+}
+
+type CarDetails {
+    car: Car!
+    specification: CarSpecification
 }
 
 type Query {
-    hello: String
+    # Car queries
+    car(id: ID!): Car
+    cars: [Car]
+    carsByMake(make: String!): [Car]
+    carsByOwner(ownerId: ID!): [Car]
+    carByRegistration(registrationNumber: RegistrationNumber!): Car
+    carDetails(id: ID!): CarDetails
+
+    # Owner queries
+    owner(id: ID!): Owner
+    owners: [Owner]
+    ownerByEmail(email: Email!): Owner
+    ownersWithCars: [Owner]
+}
+
+input CarInput {
+    make: String!
+    model: String!
+    year: Int
+    registrationNumber: RegistrationNumber
+    ownerId: ID
+}
+
+input OwnerInput {
+    name: String!
+    email: Email!
+    phoneNumber: String
+}
+
+type Mutation {
+    # Car mutations
+    createCar(input: CarInput!): ResponseType!
+    updateCar(id: ID!, input: CarInput!): ResponseType!
+    deleteCar(id: ID!): ResponseType!
+
+    # Owner mutations
+    createOwner(input: OwnerInput!): ResponseType!
+    updateOwner(id: ID!, input: OwnerInput!): ResponseType!
+    deleteOwner(id: ID!): ResponseType!
 }
